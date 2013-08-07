@@ -1,4 +1,4 @@
-package br.com.jaman.config.pkg;
+package br.com.jetpack.config.pkg;
 
 import java.io.File;
 

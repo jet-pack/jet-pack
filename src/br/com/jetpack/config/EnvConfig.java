@@ -1,4 +1,4 @@
-package br.com.jaman.config;
+package br.com.jetpack.config;
 
 /**
  * Configurações de ambiente.

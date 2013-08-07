@@ -1,7 +1,7 @@
-package br.com.jaman.packages.system;
+package br.com.jetpack.packages.system;
 
-import br.com.jaman.config.pkg.PkgBuild;
-import br.com.jaman.packages.installer.InstallerScript;
+import br.com.jetpack.config.pkg.PkgBuild;
+import br.com.jetpack.packages.installer.InstallerScript;
 
 public class PackageManager {
 

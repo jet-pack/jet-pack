@@ -1,9 +1,10 @@
-package br.com.jaman.packages.system;
+package br.com.jetpack.packages.system;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LogicalPackage {
+public class LogicalPackage implements Serializable{
 	private String name;
 	private String[] depends;
 	private List<String> dependents = new ArrayList<String>();
