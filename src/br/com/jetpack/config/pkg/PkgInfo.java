@@ -1,8 +1,12 @@
 package br.com.jetpack.config.pkg;
 
+import br.com.jetpack.config.pkg.reader.PkgInfoReader;
+import br.com.jetpack.config.pkg.reader.PropertyNotFoundException;
+import br.com.jetpack.packages.system.PkgAndVersion;
+
 /**
- * Essa classe representa as informações do comum entre o script de instalacao
- * e o script do pacote ja instalado
+ * Essa classe representa as informações do comum entre o script de instalacao e
+ * o script do pacote ja instalado
  * 
  * @author renatol
  * 
@@ -15,9 +19,10 @@ public abstract class PkgInfo {
 	protected String basePackage;
 	protected String url;
 	protected String[] groups;
-	protected String[] depends;
-	protected String[] optDepends;
-	protected String[] conflict;
+	protected PkgAndVersion[] dependsWithVersion;
+	protected String[] depends = new String[] {};
+	protected PkgAndVersion[] optDepends;
+	protected PkgAndVersion[] conflict;
 	protected String[] replaces;
 	protected String[] backup;
 
@@ -32,8 +37,7 @@ public abstract class PkgInfo {
 	}
 
 	/**
-	 * Deve ser pequena e não incluir o nome do pacote. Deve servir apenas
-	 * para
+	 * Deve ser pequena e não incluir o nome do pacote. Deve servir apenas para
 	 * dar uma idéia geral.
 	 * 
 	 * @return
@@ -43,8 +47,7 @@ public abstract class PkgInfo {
 	}
 
 	/**
-	 * Versão do pacote. Essa pode ser utilizada em uma eventual
-	 * atualização
+	 * Versão do pacote. Essa pode ser utilizada em uma eventual atualização
 	 * 
 	 * @return
 	 */
@@ -54,8 +57,7 @@ public abstract class PkgInfo {
 
 	/**
 	 * Define qual o pacote é seu pacote base. Isso deve ser utilizado
-	 * principalmente no caso de pacotes que não fazem sentido sozinhos.
-	 * Será
+	 * principalmente no caso de pacotes que não fazem sentido sozinhos. Será
 	 * considerado em caso de remoção do pacote base
 	 * 
 	 * @return
@@ -83,36 +85,47 @@ public abstract class PkgInfo {
 	}
 
 	/**
-	 * Um array com o nome dos pacote que devem ser instalados antes desse
-	 * para
+	 * Um array com o nome dos pacote que devem ser instalados antes desse para
 	 * funcionar. Se existe uma dependencia com uma versão minima deve ser
 	 * especificado >= versão conforme o exemplo
 	 * 
 	 * @return
 	 */
+	public PkgAndVersion[] getDependsWithVersion() {
+		return dependsWithVersion;
+	}
+
 	public String[] getDepends() {
 		return depends;
 	}
 
+	private String[] fillDependsString() {
+		String[] ret;
+		ret = new String[dependsWithVersion.length];
+		for (int i = 0; i < ret.length; i++) {
+			ret[i] = dependsWithVersion[i].getName();
+		}
+		return ret;
+	}
+
 	/**
-	 * Um array com o nome dos pacotes que são necessários para o
-	 * funcionamento,
+	 * Um array com o nome dos pacotes que são necessários para o funcionamento,
 	 * porem com caracteristicas adicionais
 	 * 
 	 * @return
 	 */
-	public String[] getOptDepends() {
+	public PkgAndVersion[] getOptDepends() {
 		return optDepends;
 	}
 
 	/**
-	 * Um array com o nome dos pacote que podem conflitar com os pacotes
+	 * lUm array com o nome dos pacote que podem conflitar com os pacotes
 	 * instalados(dependencias) ou com ele mesmo. conforme o exemplo(mesmo
 	 * formato do depends)
 	 * 
 	 * @return
 	 */
-	public String[] getConflict() {
+	public PkgAndVersion[] getConflict() {
 		return conflict;
 	}
 
@@ -127,12 +140,9 @@ public abstract class PkgInfo {
 	}
 
 	/**
-	 * Um array com os arquivos que deve ser feito um backup antes de
-	 * efetuar
-	 * uma remoção/instalação ou atualização do pacote. Esses arquivos
-	 * podem ser
-	 * relativos a instalação ou caminho completo. (VER COMO VAI SER O USO
-	 * DISSO
+	 * Um array com os arquivos que deve ser feito um backup antes de efetuar
+	 * uma remoção/instalação ou atualização do pacote. Esses arquivos podem ser
+	 * relativos a instalação ou caminho completo. (VER COMO VAI SER O USO DISSO
 	 * 
 	 * @return
 	 */
@@ -140,4 +150,23 @@ public abstract class PkgInfo {
 		return backup;
 	}
 
+	public final void load(PkgInfoReader reader) throws PropertyNotFoundException {
+		name = reader.getStr("name");
+		version = reader.getStr("version");
+		desc = reader.optStr("desc");
+		basePackage = reader.optStr("basePackage");
+		url = reader.optStr("url");
+		groups = reader.optStrArray("groups");
+		dependsWithVersion = reader.optPkgAndVersions("depends");
+		fillDependsString();
+		optDepends = reader.optPkgAndVersions("optdepends");
+		conflict = reader.optPkgAndVersions("conflict");
+		replaces = reader.optStrArray("replaces");
+		backup = reader.optStrArray("backup");
+		doLoad(reader);
+	}
+
+	protected void doLoad(PkgInfoReader reader) throws PropertyNotFoundException {
+		// here nothing...
+	}
 }

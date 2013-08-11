@@ -1,4 +1,4 @@
-package org.json;
+package br.com.jetpack.config.json;
 
 /*
 Copyright (c) 2008 JSON.org

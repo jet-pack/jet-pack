@@ -1,7 +1,7 @@
 package br.com.jetpack.config.pkg;
 
 /**
- * Representa o pacote já instalado.
+ * Representa o pacote jï¿½ instalado.
  * 
  * @author renato.lorenzi
  * 

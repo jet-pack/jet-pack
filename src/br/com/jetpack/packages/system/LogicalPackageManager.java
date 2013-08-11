@@ -32,20 +32,6 @@ public class LogicalPackageManager {
 		updateDependents(pkg);
 		packages.put(pkg.getName(), new LogicalPackage(pkg.getName(), pkg.getDepends()));
 	}
-
-	/**
-	 * Add new pacote with dependent of depends packages.
-	 * 
-	 * @param pkg
-	 */
-	private void updateDependents(InstalledPkgInfo pkg) {
-		String name = pkg.getName();
-		for (String dependName : pkg.getDepends()) {
-			LogicalPackage depend = packages.get(dependName);
-			depend.addDependents(name);
-		}
-	}
-
 	/**
 	 * Remove package in installed packages.
 	 * 
@@ -54,9 +40,13 @@ public class LogicalPackageManager {
 	public boolean remove(String pkgName) {
 		boolean hasDependents = hasDependents(pkgName);
 		if (!hasDependents) {
-			packages.remove(pkgName);
+			LogicalPackage pkg = packages.remove(pkgName);
+			// Se remove como dependente pois ja foi desinstalado
+			for (String depend : pkg.getDepends()) {
+				packages.get(depend).removeDependents(pkgName);
+			}
 		}
-		return hasDependents;
+		return !hasDependents;
 	}
 
 	/**
@@ -125,4 +115,18 @@ public class LogicalPackageManager {
 			objectOutputStream.close();
 		}
 	}
+
+	/**
+	 * Add new pacote with dependent of depends packages.
+	 * 
+	 * @param pkg
+	 */
+	private void updateDependents(InstalledPkgInfo pkg) {
+		String name = pkg.getName();
+		for (String dependName : pkg.getDepends()) {
+			LogicalPackage depend = packages.get(dependName);
+			depend.addDependents(name);
+		}
+	}
 }
+

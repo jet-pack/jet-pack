@@ -1,4 +1,4 @@
-package org.json;
+package br.com.jetpack.config.json;
 
 
 /*

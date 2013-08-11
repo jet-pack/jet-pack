@@ -1,4 +1,4 @@
-package org.json;
+package br.com.jetpack.config.json;
 
 /**
  * The JSONException is thrown by the JSON.org classes when things are amiss.

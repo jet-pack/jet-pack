@@ -1,5 +1,7 @@
 package br.com.jetpack.config.pkg;
 
+import br.com.jetpack.config.pkg.reader.PkgInfoReader;
+import br.com.jetpack.config.pkg.reader.PropertyNotFoundException;
 
 /**
  * 
@@ -7,8 +9,7 @@ package br.com.jetpack.config.pkg;
  * 
  * @author renatol
  * 
- *         Em qualquer propriedade pode ser utilizado as variaveis já
- *         existentes
+ *         Em qualquer propriedade pode ser utilizado as variaveis já existentes
  * 
  * 
  */
@@ -29,8 +30,7 @@ public class PkgBuild extends PkgInfo {
 	}
 
 	/**
-	 * Pacotes que são necessários apenas para instalação (não para
-	 * execução)
+	 * Pacotes que são necessários apenas para instalação (não para execução)
 	 * 
 	 * @return
 	 */
@@ -58,4 +58,15 @@ public class PkgBuild extends PkgInfo {
 		return source;
 	}
 
+	@Override
+	protected void doLoad(PkgInfoReader reader) throws PropertyNotFoundException {
+		makeDepends = reader.optStrArray("makedepends");
+		source = reader.optStrArray("source");
+		installScript = reader.optStr("installScript");
+
+		if (source.equals("") && installScript.equals("")) {
+			throw new PropertyNotFoundException("Deve ser definido ou a propriedade %s ou %s", "installScript", "source");
+		}
+		arch = reader.optStr("arch");
+	}
 }
