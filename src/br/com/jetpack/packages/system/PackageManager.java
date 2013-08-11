@@ -1,8 +1,10 @@
 package br.com.jetpack.packages.system;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import br.com.jetpack.config.pkg.PkgInfo;
 import br.com.jetpack.config.pkg.loader.PackageLoader;
-import br.com.jetpack.packages.installer.Installer;
 
 public class PackageManager {
 
@@ -16,21 +18,46 @@ public class PackageManager {
 	}
 
 	/**
-	 * Instala um pacote
+	 * Installs the package and their dependencies
 	 * 
 	 * @param pkgInfo
+	 * @return Return false if already installed.
 	 * @throws LessVersionException
 	 */
-	public void install(PkgInfo pkgInfo) throws LessVersionException {
-		installDependencies(pkgInfo.getDependsWithVersion());
+	public boolean install(PkgInfo pkgInfo) throws LessVersionException {
+		if (isInstalled(pkgInfo.getName())) {
+			return false;
+		}
+		List<String> pkgsToInstall = new ArrayList<String>();
+		checkDependencies(pkgInfo.getDependsWithVersion(), pkgsToInstall);
+
+		for (String pkgName : pkgsToInstall) {
+			remote.loadInstallerScript(pkgName).install();
+		}
+		return true;
 	}
 
-	private void installDependencies(final PkgAndVersion[] dependsWithVersion) throws LessVersionException {
+	public boolean isInstalled(String pkgName) {
+		return manager.isInstalled(pkgName);
+	}
+
+	/**
+	 * Check dependencies between packages and mounts the list of packages that
+	 * will be installed
+	 * 
+	 * @param dependsWithVersion
+	 * @param pkgsToInstall
+	 * @throws LessVersionException
+	 */
+	private void checkDependencies(final PkgAndVersion[] dependsWithVersion, List<String> pkgsToInstall) throws LessVersionException {
 		for (PkgAndVersion dep : dependsWithVersion) {
 			final String pkgName = dep.getName();
 
 			if (!manager.isInstalled(pkgName)) {
-				install(remote.loadPackage(pkgName));
+				// first check and add depends in pkgsToInstall
+				checkDependencies(remote.loadPackage(pkgName).getDependsWithVersion(), pkgsToInstall);
+				// after add self
+				pkgsToInstall.add(pkgName);
 			} else {
 				if (!"".equals(dep.getMinimalVersion())) {
 					PkgInfo pkg = local.loadPackage(pkgName);
