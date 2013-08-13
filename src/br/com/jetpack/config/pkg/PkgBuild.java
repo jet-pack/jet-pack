@@ -1,5 +1,9 @@
 package br.com.jetpack.config.pkg;
 
+import java.io.File;
+import java.io.IOException;
+
+import br.com.jetpack.Utils.ZipUtils;
 import br.com.jetpack.config.pkg.reader.PkgInfoReader;
 import br.com.jetpack.config.pkg.reader.PropertyNotFoundException;
 
@@ -68,5 +72,20 @@ public class PkgBuild extends PkgInfo {
 			throw new PropertyNotFoundException("Deve ser definido ou a propriedade %s ou %s", "installScript", "source");
 		}
 		arch = reader.optStr("arch");
+	}
+	
+	public void makeJetPack() throws IOException {
+		StringBuilder sb = new StringBuilder();
+		sb.append(System.getProperty("java.io.tmpdir"));
+		sb.append("\\");
+		sb.append(getName());
+		sb.append(".jetpack");
+		File[] files = new File[getSource().length]; //TODO: +1 quando for adicionar o .properties na lista
+		for (int i = 0; i < getSource().length; i++) {
+			files[i] = new File(source[i]);
+		}
+//		files[getSource().length] = 
+//TODO: Adicionar o arquivo pkgBuild.Properties usado para gerar (?)
+		ZipUtils.compress(files, new File(sb.toString()));
 	}
 }
