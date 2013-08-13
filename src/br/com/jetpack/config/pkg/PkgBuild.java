@@ -73,19 +73,4 @@ public class PkgBuild extends PkgInfo {
 		}
 		arch = reader.optStr("arch");
 	}
-	
-	public void makeJetPack() throws IOException {
-		StringBuilder sb = new StringBuilder();
-		sb.append(System.getProperty("java.io.tmpdir"));
-		sb.append("\\");
-		sb.append(getName());
-		sb.append(".jetpack");
-		File[] files = new File[getSource().length]; //TODO: +1 quando for adicionar o .properties na lista
-		for (int i = 0; i < getSource().length; i++) {
-			files[i] = new File(source[i]);
-		}
-//		files[getSource().length] = 
-//TODO: Adicionar o arquivo pkgBuild.Properties usado para gerar (?)
-		ZipUtils.compress(files, new File(sb.toString()));
-	}
 }
